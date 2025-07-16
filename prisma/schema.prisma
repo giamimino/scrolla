@@ -1,0 +1,143 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String         @id @default(cuid())
+  name           String
+  email          String         @unique
+  hashedPassword String
+  bio            String         @default("")
+  profileImage   String         @default("user-image")
+  isVerified     Boolean        @default(false)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  posts          Posts[]
+  comments       Comments[]
+  likedPosts     PostLike[]
+  likedComments  CommentLike[]
+  savedPosts     SavedPost[]
+
+  following      Follow[]       @relation("Following")
+  followers      Follow[]       @relation("Followers")
+
+  session Session[]
+}
+
+model Session {
+  id String @id @default(cuid())
+  user_id String
+  user User @relation(references: [id], fields: [user_id])
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model Posts {
+  id          String        @id @default(cuid())
+  user        User          @relation(fields: [userId], references: [id])
+  userId      String
+  image       String
+  title       String
+  description String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  likes       PostLike[]
+  comments    Comments[]
+  savedBy     SavedPost[]
+  tags        PostTag[]
+}
+
+model Comments {
+  id         String       @id @default(cuid())
+  post       Posts        @relation(fields: [postId], references: [id])
+  postId     String
+  user       User         @relation(fields: [userId], references: [id])
+  userId     String
+  comment    String
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  likes      CommentLike[]
+}
+
+model PostLike {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  post      Posts    @relation(fields: [postId], references: [id])
+  postId    String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, postId])
+}
+
+model CommentLike {
+  id         String   @id @default(cuid())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  comment    Comments @relation(fields: [commentId], references: [id])
+  commentId  String
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, commentId])
+}
+
+model SavedPost {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  post      Posts    @relation(fields: [postId], references: [id])
+  postId    String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, postId])
+}
+
+model Follow {
+  id           String   @id @default(cuid())
+  follower     User     @relation("Following", fields: [followerId], references: [id])
+  followerId   String
+  following    User     @relation("Followers", fields: [followingId], references: [id])
+  followingId  String
+  createdAt    DateTime @default(now())
+
+  @@unique([followerId, followingId])
+}
+
+model EmailVerificationCode {
+  id         String   @id @default(cuid())
+  email      String
+  code       String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+}
+
+model Tag {
+  id    String     @id @default(cuid())
+  name  String     @unique
+  posts PostTag[]
+}
+
+model PostTag {
+  id     String @id @default(cuid())
+  post   Posts  @relation(fields: [postId], references: [id])
+  postId String
+  tag    Tag    @relation(fields: [tagId], references: [id])
+  tagId  String
+
+  @@unique([postId, tagId])
+}
