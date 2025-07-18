@@ -8,7 +8,11 @@ export async function GET() {
     const cookiesStore = await cookies()
     const sessionId = cookiesStore.get("sessionId")?.value
 
-    const session = await prisma.session.findFirst({
+    if (!sessionId) {
+      return NextResponse.json({ success: false, error: "No sessionId found" });
+    }
+
+    const session = await prisma.session.findUnique({
       where: {id: sessionId},
       select: {
         expiresAt: true,
@@ -17,11 +21,13 @@ export async function GET() {
     })
 
     if(!session) {
-      return NextResponse.json({success: false})
+      return NextResponse.json({success: false, error: "Session not found"})
     }
 
-    if(session?.expiresAt < new Date()) {
-      return NextResponse.json({success: false})
+    const expiresAt = new Date(session.expiresAt);
+
+    if(expiresAt < new Date()) {
+      return NextResponse.json({success: false, error: "Session expired"})
     }
 
     const user = await prisma.user.findUnique({
@@ -31,10 +37,10 @@ export async function GET() {
     })
 
     if(!user) {
-      return NextResponse.json({success: false})
+      return NextResponse.json({success: false, error: "User not found" })
     }
 
-    return NextResponse.json({ user })
+    return NextResponse.json({ success: true, user })
   } catch(err: any) {
     console.log("error fetching data:", err);
     return NextResponse.json({success:false, error: err.message})

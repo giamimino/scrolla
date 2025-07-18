@@ -4,6 +4,7 @@ import { signup } from '@/actions/actions';
 import React, { useState } from 'react';
 import styles from '../page.module.scss'
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 export default function Signup() {
   const [message, setMessage] = useState('');
@@ -15,7 +16,7 @@ export default function Signup() {
     const result = await signup(formData)
 
     if (result.success) {
-      setMessage('Registration successful!');
+      redirect('/profile')
     } else {
       setMessage(result.message || 'Error during registration');
     }

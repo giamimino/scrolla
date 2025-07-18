@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import styles from '../page.module.scss'
 import { signin } from '@/actions/actions'
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 export default function SigninPage() {
   const [message, setMessage] = useState('');
@@ -14,7 +15,7 @@ export default function SigninPage() {
     const result = await signin(formData)
 
     if (!result.success) {
-      setMessage(result.message || 'Error during registration');
+      redirect('/profile')
     } else {
       if(result.success) {
         setMessage('Registration successful!');

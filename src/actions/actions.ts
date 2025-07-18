@@ -61,7 +61,6 @@ export async function signup(formData: FormData) {
     }
 
     cookiestore.set("sessionId", session.id, {
-      httpOnly: true,
       secure: true,
       maxAge: 60 * 60 * 24 * 7, // 7 days
       path: "/",
@@ -122,7 +121,6 @@ export async function signin(formData: FormData) {
     });
 
     cookieStore.set("sessionId", session.id, {
-      httpOnly: true,
       secure: true,
       maxAge: 60 * 60 * 24 * 7, // 7 days
       path: "/",
