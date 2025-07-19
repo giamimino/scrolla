@@ -1,0 +1,47 @@
+.page {
+  padding: 48px;
+
+  >div {
+    display: flex;
+    gap: 48px;
+    align-items: center;
+
+    >svg {
+      color: #858585;
+      font-size: 98px;
+      width: 128px;
+      padding-top: 12px;
+      height: 128px;
+      background-color: #000;
+      border-radius: 50%;
+    }
+    >div {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+
+      >div {
+        display: flex;
+        gap: 16px;
+        button {
+          cursor: pointer;
+          display: flex;
+          border-radius: 8px;
+          align-items: center;
+        }
+        button[data-edit] {
+          background-color: rgb(254, 44, 85);
+          padding: 8px 12px;
+          color: #fff;
+          font-weight: 500;
+        }
+        button[data-setshare] {
+          background-color: #9e9e9e21;
+          padding: 8px 12px;
+          color: #fff;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+}
