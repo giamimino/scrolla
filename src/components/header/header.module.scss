@@ -1,8 +1,10 @@
 .header {
-  background-color: #000;
+  background-color: #0c0c0c;
   padding: 24px;
   display: flex;
   justify-content: space-between;
+  box-shadow: 0 4px 8px #202020;
+  align-items: center;
   img {
     object-fit: cover;
     aspect-ratio: 3/1;
@@ -14,13 +16,38 @@
 
   nav {
     display: flex;
-    gap: 12px;
+    align-items: center;
+    gap: 16px;
     a {
       cursor: pointer;
       color: #fff;
+      opacity: 0.7;
       
       &:hover {
         text-decoration: underline;
+        opacity: 0.9;
+      }
+
+      &.active {
+        opacity: 1;
+      }
+    }
+    >div {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      svg {
+        font-size: 32px;
+        color: #ccc;
+        padding-top: 4px;
+        background-color: #000;
+        border-radius: 50%;
+        box-shadow: 0 0 4px #525252a6;
+      }
+
+      a {
+        color: #fff;
+        font-weight: 500;
       }
     }
   }

@@ -5,7 +5,7 @@
     display: flex;
     gap: 48px;
     align-items: center;
-
+    
     >svg {
       color: #858585;
       font-size: 98px;
@@ -23,6 +23,20 @@
       >div {
         display: flex;
         gap: 16px;
+        align-items: center;
+
+        h2 {
+          color: #fff;
+          font-size: 19px;
+          font-weight: 500;
+        }
+    
+        p {
+          color: #d6d6d6;
+          font-weight: 500;
+          opacity: 0.8;
+        }
+
         button {
           cursor: pointer;
           display: flex;
@@ -40,6 +54,18 @@
           padding: 8px 12px;
           color: #fff;
           font-weight: 500;
+        }
+
+        >div {
+          display: flex;
+          gap: 6px;
+          span {
+            color: #fff;
+          }
+
+          button {
+            color: #fff;
+          }
         }
       }
     }

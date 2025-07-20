@@ -7,6 +7,9 @@ import { Icon } from '@iconify/react'
 type User = {
   name: string,
   email: string,
+  following: {id: string}[],
+  followers: {id: string}[],
+  likedPosts: {id: string}[],
 }
 
 export default function Page() {
@@ -34,7 +37,7 @@ export default function Page() {
         <div>
           <div>
             <h2>{user?.name}</h2>
-            <p>{user?.email}</p>
+            <p>@{user?.name}</p>
           </div>
           <div>
             <button data-edit>Edit profile</button>
@@ -42,9 +45,9 @@ export default function Page() {
             <button data-setshare><Icon icon={"majesticons:share"} /></button>
           </div>
           <div>
-            <div><span></span><button data-socstats>Following</button></div>
-            <div><span></span><button data-socstats>Followers</button></div>
-            <div><span></span><button data-socstats>Likes</button></div>
+            <div><span>{user?.following.length ?? 0}</span><button data-socstats>Following</button></div>
+            <div><span>{user?.followers.length ?? 0}</span><button data-socstats>Followers</button></div>
+            <div><span>{user?.likedPosts.length ?? 0}</span><button data-socstats>Likes</button></div>
           </div>
         </div>
       </div>
