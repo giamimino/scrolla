@@ -10,6 +10,7 @@ type User = {
   following: {id: string}[],
   followers: {id: string}[],
   likedPosts: {id: string}[],
+  bio: string
 }
 
 export default function Page() {
@@ -49,8 +50,25 @@ export default function Page() {
             <div><span>{user?.followers.length ?? 0}</span><button data-socstats>Followers</button></div>
             <div><span>{user?.likedPosts.length ?? 0}</span><button data-socstats>Likes</button></div>
           </div>
+          <div>
+            <p> 
+              {user?.bio}
+            </p>
+          </div>
         </div>
       </div>
+      <main>
+        <aside>
+          <nav>
+            <div><Icon icon="gridicons:posts" /> posts</div>
+            <div><Icon icon="material-symbols:bookmark-outline" /> saved</div>
+            <div><Icon icon="mdi:heart-outline" /> liked</div>
+          </nav>
+        </aside>
+        <main>
+
+        </main>
+      </main>
     </div>
   )
 }

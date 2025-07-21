@@ -1,5 +1,8 @@
 .page {
   padding: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
 
   >div {
     display: flex;
@@ -18,7 +21,7 @@
     >div {
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 12px;
 
       >div {
         display: flex;
@@ -34,7 +37,7 @@
         p {
           color: #d6d6d6;
           font-weight: 500;
-          opacity: 0.8;
+          opacity: 0.9;
         }
 
         button {
@@ -61,13 +64,61 @@
           gap: 6px;
           span {
             color: #fff;
+            font-weight: 500;
           }
 
           button {
             color: #fff;
+            cursor: pointer;
+            opacity: 0.8;
+
+            &:hover {
+              text-decoration: underline;
+            }
           }
         }
       }
+    }
+  }
+
+  >main {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    user-select: none;
+
+    aside {
+      border-bottom: 2px solid #cccccc8e;
+
+      nav {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+
+        div {
+          width: 100%;
+          display: flex;
+          gap: 6px;
+          align-items: center;
+          justify-content: center;
+          border-bottom: 2px solid transparent;
+          position: relative;
+          bottom: -1px;
+          cursor: pointer;
+          transition: all .2s ease;
+          font-size: 18px;
+
+          &:hover {
+            border-bottom: 2px solid #fff;
+          }
+        }
+      }
+    }
+
+    main {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
     }
   }
 }
