@@ -5,16 +5,27 @@ import { cookies } from "next/headers";
 
 export async function signup(formData: FormData) {
   try {
-    const name = formData.get("name") as string;
+    const username = formData.get("name") as string;
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const cookiestore = await cookies();
 
-    if (!name || !email || !password) {
+    if (!username || !email || !password) {
       return {
         success: false,
         message: "All fields are required.",
       };
+    }
+
+    const existName = await prisma.user.findMany({
+      where: { username },
+    })
+
+    if(existName.length > 0) {
+      return {
+        success: false,
+        message: "This username is already in use."
+      }
     }
 
     const existEmail = await prisma.user.findMany({
@@ -32,7 +43,8 @@ export async function signup(formData: FormData) {
 
     const user = await prisma.user.create({
       data: {
-        name,
+        username,
+        name: username,
         email,
         hashedPassword,
       },

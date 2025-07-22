@@ -8,6 +8,7 @@
     display: flex;
     gap: 48px;
     align-items: center;
+    user-select: none;
     
     >svg {
       color: #858585;
@@ -38,6 +39,7 @@
           color: #d6d6d6;
           font-weight: 500;
           opacity: 0.9;
+          user-select: text;
         }
 
         button {
@@ -45,18 +47,27 @@
           display: flex;
           border-radius: 8px;
           align-items: center;
+          transition: all .3s ease;
         }
         button[data-edit] {
           background-color: rgb(254, 44, 85);
           padding: 8px 12px;
           color: #fff;
           font-weight: 500;
+
+          &:hover {
+            background-color: rgba(254, 44, 85, 0.8);
+          }
         }
         button[data-setshare] {
           background-color: #9e9e9e21;
-          padding: 8px 12px;
+          padding: 12px;
           color: #fff;
           font-weight: 500;
+
+          &:hover {
+            background-color: #424242;
+          }
         }
 
         >div {
@@ -120,5 +131,118 @@
       flex-wrap: wrap;
       gap: 12px;
     }
+  }
+}
+
+.edit {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1009;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  >div {
+    animation: popUp .5s ease forwards;
+    border: 2px solid #000;
+    background-color: rgb(18, 18, 18);
+    border-radius: 9px;
+    padding: 12px 24px;
+    height: calc(70vh);
+    overflow: hidden;
+    overflow-y: auto;
+
+    >div {
+      display: flex;
+      justify-content: space-between;
+
+      h1 {
+        font-size: 20px;
+        font-weight: 600;
+      }
+
+      button {
+        font-size: 20px;
+        opacity: 0.8;
+        transition: all .3s ease;
+        cursor: pointer;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
+
+    form {
+      padding: 12px 24px;
+
+      >aside {
+        display: flex;
+        gap: 12px;
+        justify-content: end;
+        padding: 8px;
+
+        button {
+          padding: 6px 10px;
+          background-color: rgba(255, 255, 255, 0.19);
+          border-radius: 4px;
+          cursor: pointer;
+        }
+
+        button:nth-child(2) {
+          background-color: rgb(254, 44, 85);
+        }
+      }
+
+      >div {
+        display: flex;
+        padding: 48px 24px;
+        border-bottom: 1px solid #fff;
+        justify-content: space-between;
+
+        >div {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+
+          input,
+          textarea {
+            background-color: rgba(255, 255, 255, 0.12);
+            padding: 8px 10px;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 14px;
+
+            &:focus {
+              outline: none;
+              border: none;
+              background-color: rgba(255, 255, 255, 0.08);
+            }
+          }
+
+          p {
+            width: 250px;
+            font-size: 13px;
+            opacity: 0.7;
+          }
+        }
+      }
+    }
+  }
+}
+
+@keyframes popUp {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
   }
 }

@@ -10,11 +10,13 @@ type User = {
   following: {id: string}[],
   followers: {id: string}[],
   likedPosts: {id: string}[],
-  bio: string
+  bio: string,
+  username: string,
 }
 
 export default function Page() {
   const [user, setUser] = useState<User | null>(null)
+  const [isEdit, setIsEdit] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -38,10 +40,10 @@ export default function Page() {
         <div>
           <div>
             <h2>{user?.name}</h2>
-            <p>@{user?.name}</p>
+            <p>@{user?.username}</p>
           </div>
           <div>
-            <button data-edit>Edit profile</button>
+            <button data-edit onClick={() => setIsEdit(prev => !prev)}>Edit profile</button>
             <button data-setshare><Icon icon={"material-symbols:settings-rounded"} /></button>
             <button data-setshare><Icon icon={"majesticons:share"} /></button>
           </div>
@@ -69,6 +71,47 @@ export default function Page() {
 
         </main>
       </main>
+      {isEdit && (
+        <main className={styles.edit}>
+          <div>
+            <div>
+              <h1>Edit profile</h1>
+              <button onClick={() => setIsEdit(prev => !prev)}><Icon icon="material-symbols:close" /></button>
+            </div>
+            <form action="">
+              <div>
+                <label htmlFor="image">Profile photo</label>
+                <div>
+                  <input type="file" name='image' id='image' accept='image/*' />
+                </div>
+              </div>
+              <div>
+                <label htmlFor="username">Username</label>
+                <div>
+                  <input type="text" id='username' name='username' defaultValue={user?.username} />
+                  <p>Usernames can only contain letters, numbers, underscores, and periods. Changing your username will also change your profile link.</p>
+                </div>
+              </div>
+              <div>
+                <label htmlFor="name">Name</label>
+                <div>
+                  <input type="text" id='name' name='name' defaultValue={user?.name} />
+                </div>
+              </div>
+              <div>
+                <label htmlFor="bio">Bio</label>
+                <div>
+                  <textarea className='resize-none' name="bio" id="bio" rows={4} defaultValue={user?.bio}></textarea>
+                </div>
+              </div>
+              <aside>
+                <button onClick={() => setIsEdit(prev => !prev)}>cancel</button>
+                <button type='submit'>save</button>
+              </aside>
+            </form>
+          </div>
+        </main>
+      )}
     </div>
   )
 }
