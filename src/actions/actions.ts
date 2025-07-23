@@ -195,4 +195,62 @@ export async function userCheck() {
       success: false
     }
   }
-} 
+}
+
+export async function editProfile(formData: FormData) {
+  try {
+    const profile_image = formData.get("image");
+
+    let uploadImageUrl: string | null = null;
+
+    if (profile_image && profile_image instanceof File) {
+      const cForm = new FormData();
+      cForm.append("file", profile_image);
+
+      const uploadUrl = process.env.CLOUDFLARE_SCROLLA_BUCKET;
+      if (!uploadUrl) {
+        return {
+          success: false,
+          message: "Upload URL not configured",
+        };
+      }
+
+      const res = await fetch(uploadUrl, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.c}`, // safer
+        },
+        body: cForm,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        return {
+          success: false,
+          message: "Image upload failed",
+        };
+      }
+
+      uploadImageUrl = data.result.variants[0];
+      console.log("Uploaded image URL:", uploadImageUrl);
+
+      return {
+        success: true,
+        message: "Image uploaded successfully",
+        url: uploadImageUrl,
+      };
+    } else {
+      return {
+        success: false,
+        message: "No image file provided",
+      };
+    }
+  } catch (err) {
+    console.error("Profile image edit error:", err);
+    return {
+      success: false,
+      message: "Unexpected error: " + (err instanceof Error ? err.message : JSON.stringify(err)),
+    };
+  }
+}
