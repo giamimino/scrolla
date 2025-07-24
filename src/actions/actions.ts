@@ -1,6 +1,9 @@
 "use server"
 import prisma from "@/lib/prisma";
+import { r2 } from "@/lib/r2";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 import bcrypt from "bcrypt"
+import { randomUUID } from "crypto";
 import { cookies } from "next/headers";
 
 export async function signup(formData: FormData) {
@@ -199,55 +202,83 @@ export async function userCheck() {
 
 export async function editProfile(formData: FormData) {
   try {
-    const profile_image = formData.get("image");
-
-    let uploadImageUrl: string | null = null;
-
-    if (profile_image && profile_image instanceof File) {
-      const cForm = new FormData();
-      cForm.append("file", profile_image);
-
-      const uploadUrl = process.env.CLOUDFLARE_SCROLLA_BUCKET;
-      if (!uploadUrl) {
-        return {
-          success: false,
-          message: "Upload URL not configured",
-        };
-      }
-
-      const res = await fetch(uploadUrl, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${process.env.c}`, // safer
-        },
-        body: cForm,
-      });
-
-      const data = await res.json();
-
-      if (!res.ok || !data.success) {
-        return {
-          success: false,
-          message: "Image upload failed",
-        };
-      }
-
-      uploadImageUrl = data.result.variants[0];
-      console.log("Uploaded image URL:", uploadImageUrl);
-
-      return {
-        success: true,
-        message: "Image uploaded successfully",
-        url: uploadImageUrl,
-      };
-    } else {
+    const name = formData.get("name") as string
+    const username = formData.get("username") as string
+    const bio = formData.get("bio") as string
+    
+    if(!name.trim() || !username.trim() || !bio.trim()) {
       return {
         success: false,
-        message: "No image file provided",
-      };
+        message: "All fields are required."
+      }
+    }
+    
+    const cookiesStore = await cookies()
+    const sessionId = cookiesStore.get("sessionId")?.value
+    if(!sessionId) {
+      return {
+        success: false,
+        message: "user have to login before edit."
+      }
+    }
+
+    const session = await prisma.session.findFirst({
+      where: {
+        id: sessionId
+      },
+      select: {
+        user: {
+          select: { id: true }
+        },
+        expiresAt: true
+      }
+    })
+    if(!session || session.expiresAt < new Date()) {
+      return {
+        success: false,
+        message: "User not found or session has expired."
+      }
+    }
+
+    const exitsUsername = await prisma.user.findFirst({
+      where: {  username, NOT: {
+        id: session.user.id
+      } },
+      select: {
+        username: true
+      }
+    })
+
+    if(exitsUsername) {
+      return {
+        success: false,
+        message: "username already exist."
+      }
+    }
+
+    const user = await prisma.user.update({
+      where: { id: session.user.id },
+      data: {
+        name,
+        username: username.toLowerCase(),
+        bio
+      }
+    })
+
+    if(!user) {
+      return {
+        success: false,
+        message: "Somthing went wrong."
+      }
+    }
+
+    return {
+      succes: true,
+      message: "Successfully updated profile.",
+      user
     }
   } catch (err) {
-    console.error("Profile image edit error:", err);
+    console.error("Profile edit error:", err);
     return {
       success: false,
       message: "Unexpected error: " + (err instanceof Error ? err.message : JSON.stringify(err)),

@@ -1,4 +1,4 @@
-import Header from '@/components/header/header';
+"use client"
 import styles from './page.module.scss'
 
 export default function Home() {

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import styles from './page.module.scss'
 import { useRouter } from 'next/navigation'
 import { Icon } from '@iconify/react'
+import Image from 'next/image'
 
 type User = {
   name: string,
@@ -12,6 +13,7 @@ type User = {
   likedPosts: {id: string}[],
   bio: string,
   username: string,
+  profileImage: string
 }
 
 export default function Page() {
@@ -33,10 +35,17 @@ export default function Page() {
       })
   }, [router])
 
+  // async function handleEditProfile(e:)
+
   return (
     <div className={styles.page}>
       <div>
-        <Icon icon={"fa6-solid:user"} />
+        {user?.profileImage === "user-image" ? <Icon icon={"fa6-solid:user"} /> : <Image 
+        src={user?.profileImage || "https://raw.githubusercontent.com/giamimino/images/refs/heads/main/scrolla/scrolla-logo.webp"} 
+        alt={user?.name || ""} 
+        width={128}
+        height={128}
+        objectFit='cover'/>}
         <div>
           <div>
             <h2>{user?.name}</h2>
@@ -79,12 +88,6 @@ export default function Page() {
               <button onClick={() => setIsEdit(prev => !prev)}><Icon icon="material-symbols:close" /></button>
             </div>
             <form action="">
-              <div>
-                <label htmlFor="image">Profile photo</label>
-                <div>
-                  <input type="file" name='image' id='image' accept='image/*' />
-                </div>
-              </div>
               <div>
                 <label htmlFor="username">Username</label>
                 <div>
