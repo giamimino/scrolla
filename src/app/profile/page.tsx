@@ -4,6 +4,7 @@ import styles from './page.module.scss'
 import { useRouter } from 'next/navigation'
 import { Icon } from '@iconify/react'
 import Image from 'next/image'
+import { editProfile } from '@/actions/actions'
 
 type User = {
   name: string,
@@ -19,6 +20,8 @@ type User = {
 export default function Page() {
   const [user, setUser] = useState<User | null>(null)
   const [isEdit, setIsEdit] = useState(false)
+  const [error, setError] = useState("")
+  const [pfpEdit, setPfpEdit] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -35,17 +38,32 @@ export default function Page() {
       })
   }, [router])
 
-  // async function handleEditProfile(e:)
+  async function handleSubmitProfileEdit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
 
+    const formData = new FormData(e.currentTarget)
+    const reslut = await editProfile(formData)
+
+    if(!reslut.succes) {
+      setError(reslut.message)
+    } else {
+      if(reslut.succes) {
+        setIsEdit(prev => !prev)
+      }
+    }
+  }
+  
   return (
     <div className={styles.page}>
       <div>
-        {user?.profileImage === "user-image" ? <Icon icon={"fa6-solid:user"} /> : <Image 
-        src={user?.profileImage || "https://raw.githubusercontent.com/giamimino/images/refs/heads/main/scrolla/scrolla-logo.webp"} 
-        alt={user?.name || ""} 
-        width={128}
-        height={128}
-        objectFit='cover'/>}
+        <span onClick={() => setPfpEdit(prev => !prev)}>
+          {user?.profileImage === "user-image" ? <Icon icon={"fa6-solid:user"} /> : <Image 
+          src={user?.profileImage || "https://raw.githubusercontent.com/giamimino/images/refs/heads/main/scrolla/scrolla-logo.webp"} 
+          alt={user?.name || ""} 
+          width={128}
+          height={128}
+          objectFit='cover'/>}
+        </span>
         <div>
           <div>
             <h2>{user?.name}</h2>
@@ -87,7 +105,7 @@ export default function Page() {
               <h1>Edit profile</h1>
               <button onClick={() => setIsEdit(prev => !prev)}><Icon icon="material-symbols:close" /></button>
             </div>
-            <form action="">
+            <form onSubmit={handleSubmitProfileEdit}>
               <div>
                 <label htmlFor="username">Username</label>
                 <div>
@@ -115,6 +133,29 @@ export default function Page() {
           </div>
         </main>
       )}
+      {pfpEdit &&
+      <main className={styles.pfpEdit}>
+        <form>
+          <div>
+            <label htmlFor="image">upload picture</label>
+            <div>
+              {user?.profileImage === "user-image" ? <Icon icon={"fa6-solid:user"} /> : <Image 
+                src={user?.profileImage || "https://raw.githubusercontent.com/giamimino/images/refs/heads/main/scrolla/scrolla-logo.webp"} 
+                alt={user?.name || ""} 
+                width={128}
+                height={128}
+                objectFit='cover'/>
+              }
+              <input type="file" name='profile_image' id='image'  accept='image/*'/>
+            </div>
+          </div>
+          <div>
+            <button onClick={() => setPfpEdit(prev => !prev)}>cancel</button>
+            <button type='submit'>save</button>
+          </div>
+        </form>
+      </main>
+      }
     </div>
   )
 }

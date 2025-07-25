@@ -285,3 +285,17 @@ export async function editProfile(formData: FormData) {
     };
   }
 }
+
+export async function uploadpfp(formData: FormData) {
+  try {
+    const image = formData.get("image") as File
+
+    const arrBuffer = image.arrayBuffer()
+  } catch(err) {
+    console.log("profile picture upload error", err);
+    return {
+      success: false,
+      message: "Something went wrong. pls try again"
+    }
+  }
+}
