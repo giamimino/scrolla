@@ -49,6 +49,9 @@ export default function Page() {
     } else {
       if(reslut.succes) {
         setIsEdit(prev => !prev)
+        setUser(user => {
+          const newUser = user.p
+        })
       }
     }
   }
@@ -129,6 +132,7 @@ export default function Page() {
                 <button onClick={() => setIsEdit(prev => !prev)}>cancel</button>
                 <button type='submit'>save</button>
               </aside>
+              {error && <p className='text-[tomato]'>{error}</p>}
             </form>
           </div>
         </main>

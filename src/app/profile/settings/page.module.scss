@@ -1,0 +1,15 @@
+.layout {
+  display: flex;
+  gap: 48px;
+
+  >aside {
+    background-color: #0c0c0c;
+    padding: 32px;
+    box-shadow: 4px 4px 8px #202020;
+
+    >h1 {
+      font-size: 20px;
+      font-weight: 600;
+    }
+  }
+}
