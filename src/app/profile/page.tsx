@@ -1,10 +1,10 @@
 "use client"
 import React, { useEffect, useState } from 'react'
 import styles from './page.module.scss'
-import { useRouter } from 'next/navigation'
+import { redirect, useRouter } from 'next/navigation'
 import { Icon } from '@iconify/react'
 import Image from 'next/image'
-import { editProfile } from '@/actions/actions'
+import { editProfile, uploadpfp } from '@/actions/actions'
 
 type User = {
   name: string,
@@ -49,10 +49,21 @@ export default function Page() {
     } else {
       if(reslut.succes) {
         setIsEdit(prev => !prev)
-        setUser(user => {
-          const newUser = user.p
-        })
       }
+    }
+  }
+
+  async function handleSubmitProfileImage(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+
+    const formData = new FormData(e.currentTarget)
+    const result = await uploadpfp(formData)
+
+    if(!result.success) {
+      setError(result.message)
+    } else {
+      setPfpEdit(prev => !prev)
+      setError("")
     }
   }
   
@@ -74,7 +85,7 @@ export default function Page() {
           </div>
           <div>
             <button data-edit onClick={() => setIsEdit(prev => !prev)}>Edit profile</button>
-            <button data-setshare><Icon icon={"material-symbols:settings-rounded"} /></button>
+            <button data-setshare onClick={() => redirect("/profile/settings")}><Icon icon={"material-symbols:settings-rounded"} /></button>
             <button data-setshare><Icon icon={"majesticons:share"} /></button>
           </div>
           <div>
@@ -139,7 +150,7 @@ export default function Page() {
       )}
       {pfpEdit &&
       <main className={styles.pfpEdit}>
-        <form>
+        <form onSubmit={handleSubmitProfileImage}>
           <div>
             <label htmlFor="image">upload picture</label>
             <div>
@@ -157,6 +168,7 @@ export default function Page() {
             <button onClick={() => setPfpEdit(prev => !prev)}>cancel</button>
             <button type='submit'>save</button>
           </div>
+          {error && <p className='text-[tomato]'>{error}</p>}
         </form>
       </main>
       }

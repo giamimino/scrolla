@@ -1,9 +1,8 @@
 "use server"
 import prisma from "@/lib/prisma";
-import { r2 } from "@/lib/r2";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
 import bcrypt from "bcrypt"
 import { randomUUID } from "crypto";
+import ImageKit from "imagekit";
 import { cookies } from "next/headers";
 
 export async function signup(formData: FormData) {
@@ -287,15 +286,123 @@ export async function editProfile(formData: FormData) {
 }
 
 export async function uploadpfp(formData: FormData) {
-  try {
-    const image = formData.get("image") as File
+  const imagekit = new ImageKit({
+    publicKey: process.env.IMAGEKIT_PUBLIC_KEY!,
+    privateKey: process.env.IMAGEKIT_PRIVATE_KEY!,
+    urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT!,
+  });
 
-    const arrBuffer = image.arrayBuffer()
+  try {
+    const image = formData.get("profile_image") as File
+
+    if(!image || !image.type.startsWith("image/")) {
+      return {
+        success: false,
+        message: "you have to upload image"
+      }
+    }
+
+    const sessionId = (await cookies()).get("sessionId")?.value
+    if(!sessionId) {
+      return {
+        success: false,
+        message: "user have to login before edit."
+      }
+    }
+
+    const session = await prisma.session.findUnique({
+      where: { id: sessionId },
+      select: {
+        expiresAt: true,
+        user: {
+          select: { id: true }
+        }
+      }
+    })
+
+    if(!session || session.expiresAt < new Date()) {
+      return {
+        success: false,
+        message: "User not found or session has expired."
+      }
+    }
+
+    const arrayBuffer = await image.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
+
+    const uploaded = await imagekit.upload({
+      file: buffer,
+      fileName: `${randomUUID()}-image.name`,
+      folder: "/posts"
+    })
+
+    if(!uploaded) {
+      return {
+        success: false,
+        message: "Failed to upload image"
+      }
+    }
+
+    const user = await prisma.user.update({
+      where: { id: session.user.id },
+      data: {
+        profileImage: uploaded.url
+      }
+    })
+
+    if(!user) {
+      return {
+        success: false,
+        message: "Failed to upload image"
+      }
+    }
+
+    return {
+      success: true,
+      message: "Successfully uploaded image"
+    }
   } catch(err) {
     console.log("profile picture upload error", err);
     return {
       success: false,
       message: "Something went wrong. pls try again"
+    }
+  }
+}
+
+export async function uploadPost(formData: FormData, tags: string[]) {
+  const imagekit = new ImageKit({
+    publicKey: process.env.IMAGEKIT_PUBLIC_KEY!,
+    privateKey: process.env.IMAGEKIT_PRIVATE_KEY!,
+    urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT!,
+  });
+  
+  try {
+    const image = formData.get("image") as File
+    const title = formData.get("image") as string
+    const desciption = formData.get("desciption") as string
+
+    if(!image || !title || !desciption || !tags) {
+      return {
+        success: false,
+        message: "All fiels are required."
+      }
+    }
+
+    if(!image.type.startsWith("image/")) {
+      return {
+        success: false,
+        message: "Uploaded image most have to be image"
+      }
+    }
+
+    // here is upload system
+    // and upload post system
+  } catch(err) {
+    console.log("error uploading image", err);
+    return {
+      success: false,
+      message: "Something went wrong."
     }
   }
 }
