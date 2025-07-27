@@ -4,6 +4,7 @@ import bcrypt from "bcrypt"
 import { randomUUID } from "crypto";
 import ImageKit from "imagekit";
 import { cookies } from "next/headers";
+import { arrayBuffer } from "stream/consumers";
 
 export async function signup(formData: FormData) {
   try {
@@ -380,9 +381,9 @@ export async function uploadPost(formData: FormData, tags: string[]) {
   try {
     const image = formData.get("image") as File
     const title = formData.get("image") as string
-    const desciption = formData.get("desciption") as string
+    const description = formData.get("desciption") as string
 
-    if(!image || !title || !desciption || !tags) {
+    if(!image || !title || !description || !tags) {
       return {
         success: false,
         message: "All fiels are required."
@@ -392,12 +393,101 @@ export async function uploadPost(formData: FormData, tags: string[]) {
     if(!image.type.startsWith("image/")) {
       return {
         success: false,
-        message: "Uploaded image most have to be image"
+        message: "Uploaded file most have to be image"
       }
     }
 
-    // here is upload system
-    // and upload post system
+    const sessionId = (await cookies()).get("sessionId")?.value
+
+    if(!sessionId) {
+      return {
+        success: false,
+        message: "user have to login before edit."
+      }
+    }
+
+    const session = await prisma.session.findUnique({
+      where: { id: sessionId },
+      select: {
+        expiresAt: true,
+        user: {
+          select: { id: true }
+        }
+      }
+    })
+
+    if(!session || session.expiresAt < new Date()) {
+      return {
+        success: false,
+        message: "User not found or session has expired."
+      }
+    }
+
+    const arrayBuffer = await image.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
+
+    const uploaded = await imagekit.upload({
+      file: buffer,
+      fileName: `${randomUUID()}-${image.name}`,
+      folder: '/posts'
+    })
+
+    if(!uploaded) {
+      return {
+        success: false,
+        message: "Failed to upload image",
+      }
+    }
+
+    const tag = await prisma.tag.createMany({
+      data: tags.map(name => ({ name: name.trim() })),
+      skipDuplicates: true,
+    })
+
+    const tagRecords = await prisma.tag.findMany({
+      where: {
+        name: { in: tags.map((tag) => tag.trim())}
+      }
+    })
+
+    const post = await prisma.posts.create({
+      data: {
+        title,
+        description,
+        image: uploaded.url,
+        user: {
+          connect: { id: session.user.id }
+        },
+      }})
+      
+      if(!post) {
+        return {
+          succcess: false,
+          message: "Can't upload post. pls try again later"
+        }
+      }
+
+      
+      const postTag = await prisma.postTag.createMany({
+        data: tagRecords.map((tag) => ({
+          tagId: tag.id,
+          postId: post.id
+        })),
+        skipDuplicates: true
+      })
+
+      if(!postTag) {
+        return {
+          success: false,
+          message: "Can't upload tags, pls try again later"
+        }
+      }
+
+      return {
+        success: true,
+        message: "successfully uploaded post"
+      }
+
   } catch(err) {
     console.log("error uploading image", err);
     return {

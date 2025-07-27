@@ -10,14 +10,24 @@
     align-items: center;
     user-select: none;
     
-    >span>svg {
-      color: #858585;
-      font-size: 98px;
-      width: 128px;
+    >span {
       padding-top: 12px;
-      height: 128px;
       background-color: #000;
       border-radius: 50%;
+      >svg {
+        color: #858585;
+        font-size: 98px;
+        width: 128px;
+        height: 128px;
+        border-radius: 50%;
+      }
+
+      >img {
+        width: 128px;
+        height: 128px;
+        object-fit: cover;
+        border-radius: 50%;
+      }
     }
     >div {
       display: flex;
@@ -112,15 +122,22 @@
           gap: 6px;
           align-items: center;
           justify-content: center;
-          border-bottom: 2px solid transparent;
+          border-bottom: 1px solid transparent;
           position: relative;
           bottom: -1px;
           cursor: pointer;
           transition: all .2s ease;
           font-size: 18px;
+          color: #cccccc8e;
 
+          &.active {
+            border-bottom: 1px solid #fff;
+            color: #fff;
+          }
+          
           &:hover {
-            border-bottom: 2px solid #fff;
+            color: #fff;
+            border-bottom: 1px solid #fff;
           }
         }
       }
@@ -130,6 +147,59 @@
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
+    }
+  }
+}
+
+.share {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1009;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+
+  >div {
+    padding: 12px 24px;
+    background-color: rgb(18, 18, 18);
+    border-radius: 8px;
+
+    p {
+      position: relative;
+      cursor: pointer;
+
+      &::before {
+        content: attr(data-clipboard-text);
+        width: fit-content;
+        height: 40px;
+        position: absolute;
+        background-color: #fff;
+        z-index: 99;
+        bottom: -45px;
+        left: 50%;
+        color: #000;
+        padding: 4px 10px;
+        white-space: nowrap;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 6px;
+        font-weight: 500;
+        opacity: 0;
+        transform: translate(-50%, 40px);
+        transition: all .3s ease;
+      }
+
+      &:hover{
+        &::before {
+          transform: translate(-50%, 0);
+          opacity: 1;
+        }
+      }
     }
   }
 }

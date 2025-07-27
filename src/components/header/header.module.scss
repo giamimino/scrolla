@@ -5,7 +5,7 @@
   justify-content: space-between;
   box-shadow: 0 4px 8px #202020;
   align-items: center;
-  img {
+  >img {
     object-fit: cover;
     aspect-ratio: 3/1;
     background: transparent;
@@ -42,6 +42,14 @@
         padding-top: 4px;
         background-color: #000;
         border-radius: 50%;
+        box-shadow: 0 0 4px #525252a6;
+      }
+
+      img {
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        object-fit: cover;
         box-shadow: 0 0 4px #525252a6;
       }
 

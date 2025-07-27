@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useState } from 'react'
 import styles from './page.module.scss'
-import { redirect, useRouter } from 'next/navigation'
+import { redirect, useRouter, useSearchParams } from 'next/navigation'
 import { Icon } from '@iconify/react'
 import Image from 'next/image'
 import { editProfile, uploadpfp } from '@/actions/actions'
@@ -22,7 +22,9 @@ export default function Page() {
   const [isEdit, setIsEdit] = useState(false)
   const [error, setError] = useState("")
   const [pfpEdit, setPfpEdit] = useState(false)
+  const [isShare, setIsShare] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
 
   useEffect(() => {
     fetch("/api/getUser")
@@ -66,6 +68,12 @@ export default function Page() {
       setError("")
     }
   }
+
+  function handleParam(value: string) {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('p', value)
+    router.push(`/profile?${params.toString()}`)
+  }
   
   return (
     <div className={styles.page}>
@@ -73,7 +81,7 @@ export default function Page() {
         <span onClick={() => setPfpEdit(prev => !prev)}>
           {user?.profileImage === "user-image" ? <Icon icon={"fa6-solid:user"} /> : <Image 
           src={user?.profileImage || "https://raw.githubusercontent.com/giamimino/images/refs/heads/main/scrolla/scrolla-logo.webp"} 
-          alt={user?.name || ""} 
+          alt={user?.name || "profile-pfp"} 
           width={128}
           height={128}
           objectFit='cover'/>}
@@ -86,7 +94,7 @@ export default function Page() {
           <div>
             <button data-edit onClick={() => setIsEdit(prev => !prev)}>Edit profile</button>
             <button data-setshare onClick={() => redirect("/profile/settings")}><Icon icon={"material-symbols:settings-rounded"} /></button>
-            <button data-setshare><Icon icon={"majesticons:share"} /></button>
+            <button data-setshare onClick={() => setIsShare(prev => !prev)}><Icon icon={"majesticons:share"} /></button>
           </div>
           <div>
             <div><span>{user?.following.length ?? 0}</span><button data-socstats>Following</button></div>
@@ -103,15 +111,21 @@ export default function Page() {
       <main>
         <aside>
           <nav>
-            <div><Icon icon="gridicons:posts" /> posts</div>
-            <div><Icon icon="material-symbols:bookmark-outline" /> saved</div>
-            <div><Icon icon="mdi:heart-outline" /> liked</div>
+            <div onClick={() => handleParam("posts")} 
+            className={searchParams.get('p') === "posts" ? styles.active : ""}>
+              <Icon icon="gridicons:posts" /> posts</div>
+            <div onClick={() => handleParam("saved")} 
+            className={searchParams.get('p') === "saved" ? styles.active : ""}>
+              <Icon icon="material-symbols:bookmark-outline" /> saved</div>
+            <div onClick={() => handleParam("liked")} 
+            className={searchParams.get('p') === "liked" ? styles.active : ""}>
+              <Icon icon="mdi:heart-outline" /> liked</div>
           </nav>
         </aside>
         <main>
-
         </main>
       </main>
+
       {isEdit && (
         <main className={styles.edit}>
           <div>
@@ -148,6 +162,7 @@ export default function Page() {
           </div>
         </main>
       )}
+      
       {pfpEdit &&
       <main className={styles.pfpEdit}>
         <form onSubmit={handleSubmitProfileImage}>
@@ -171,6 +186,18 @@ export default function Page() {
           {error && <p className='text-[tomato]'>{error}</p>}
         </form>
       </main>
+      }
+
+      {isShare &&
+        <main className={styles.share}>
+          <div>
+            <p onClick={async () => {
+                const userPath = `/profile/${user?.username}`;
+                navigator.clipboard.writeText(userPath)
+                setIsShare(prev => !prev)
+              }} data-clipboard-text={"copy!"}>{`${user?.username}`}</p>
+          </div>
+        </main>
       }
     </div>
   )
