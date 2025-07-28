@@ -439,7 +439,7 @@ export async function uploadPost(formData: FormData, tags: string[]) {
       }
     }
 
-    const tag = await prisma.tag.createMany({
+    await prisma.tag.createMany({
       data: tags.map(name => ({ name: name.trim() })),
       skipDuplicates: true,
     })

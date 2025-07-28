@@ -11,7 +11,7 @@ export default function Home() {
         <div className={styles.post}>
           <div>
             <div className={styles.image}></div>
-            <h1>{"s"}</h1>
+            <h1>{"title"}</h1>
             <p>{"descritpion"}</p>
           </div>
           <aside>
@@ -23,8 +23,8 @@ export default function Home() {
         </div>
       </main>
       <aside>
-        <button>up</button>
-        <button>down</button>
+        <button><Icon icon={"lsicon:up-filled"} /></button>
+        <button><Icon icon={"lsicon:down-filled"} /></button>
       </aside>
     </div>
   );

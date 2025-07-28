@@ -21,10 +21,71 @@
         padding: 6px;
       }
 
+      >div {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        >div {
+          position: relative;
+          height: 38px;
+          width: 100%;
+          
+          input {
+            width: 100%;
+            position: absolute;
+          }
+  
+          >button {
+            background-color: #fff;
+            color: #000;
+            font-weight: 500;
+            font-size: 17px;
+            border-radius: 8px;
+            padding: 4px;
+            width: 24px;
+            height: 24px;
+            border: 1px solid #fff;
+            position: absolute;
+            top: 7px;
+            right: 7px;
+            transform: translate(30px, -30px) rotate(-360deg);
+            opacity: 0;
+            transition: transform .8s ease, opacity 1s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+          }
+        }
+  
+        &:focus-within {
+          button {
+            transform: translate(0, 0) rotate(0);
+            opacity: 1;
+          }
+        }
+        >main {
+          >div {
+            >div {
+              display: flex;
+              gap: 4px;
+              padding: 4px 12px;
+              border-radius: 12px;
+              background-color: #fff;
+              width: fit-content;
+              color: #000;
+              align-items: center;
 
+              button {
+                cursor: pointer;
+              }
+            }
+          }
+        }
+      }
     }
 
-    button {
+    >button {
       padding: 8px;
       background-color: #fff;
       border-radius: 8px;
