@@ -7,6 +7,7 @@ import Image from 'next/image'
 import { editProfile, uploadpfp } from '@/actions/actions'
 
 type User = {
+  id: string,
   name: string,
   email: string,
   following: {id: string}[],
@@ -17,12 +18,38 @@ type User = {
   profileImage: string
 }
 
+type Post = {
+  image: string;
+  _count: {
+    likes: number;
+  };
+  id: string;
+}
+
+function PostContainer(props: { image: string; id: string; likes: number }) {
+  return (
+    <div className={styles.post}>
+      <Image
+        src={props.image}
+        alt={props.id}
+        width={150}
+        height={100}
+      />
+      <span>
+        <Icon icon={'mdi:heart'} />
+        {props.likes}
+      </span>
+    </div>
+  )
+}
+
 export default function Page() {
   const [user, setUser] = useState<User | null>(null)
   const [isEdit, setIsEdit] = useState(false)
   const [error, setError] = useState("")
   const [pfpEdit, setPfpEdit] = useState(false)
   const [isShare, setIsShare] = useState(false)
+  const [post, setPost] = useState<Post[] | null>(null)
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -39,6 +66,31 @@ export default function Page() {
         console.log(err)
       })
   }, [router])
+
+  useEffect(() => {
+    const param = searchParams.get("p");
+    if (!user?.id || !param) return;
+
+    fetch('/api/getProfilePosts', {
+      method: 'POST',
+      headers: { "content-type": 'application/json' },
+      body: JSON.stringify({ curParam: param, user_id: user.id })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data && Array.isArray(data.posts?.posts)) {
+          setPost(data.posts.posts);
+        } else {
+          setError(data.message || "Failed to load posts");
+          setPost([]);
+        }
+      })
+      .catch(err => {
+        console.log("fetch error:", err)
+        setError("Network error");
+      });
+  }, [searchParams, user?.id]);
+
 
   async function handleSubmitProfileEdit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -123,6 +175,16 @@ export default function Page() {
           </nav>
         </aside>
         <main>
+          {post &&
+            post.map((p) => (
+              <PostContainer
+                image={p.image}
+                likes={p._count?.likes ?? 0}
+                id={p.id}
+                key={p.id}
+              />
+            ))
+          }
         </main>
       </main>
 

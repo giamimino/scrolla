@@ -2,9 +2,16 @@ import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 
-export async function GET() {
+export async function POST(req: Request) {
   try {
+    const { search } = await req.json()
     const tags = await prisma.tag.findMany({
+      where: {
+        name: {
+          contains: search,
+          mode: 'insensitive',
+        }
+      },
       select: {
         name: true
       }

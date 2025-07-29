@@ -380,8 +380,8 @@ export async function uploadPost(formData: FormData, tags: string[]) {
   
   try {
     const image = formData.get("image") as File
-    const title = formData.get("image") as string
-    const description = formData.get("desciption") as string
+    const title = formData.get("title") as string
+    const description = formData.get("descripton") as string
 
     if(!image || !title || !description || !tags) {
       return {

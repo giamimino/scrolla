@@ -15,10 +15,10 @@ export default function SigninPage() {
     const result = await signin(formData)
 
     if (!result.success) {
-      redirect('/profile')
+      setMessage(result.message);
     } else {
       if(result.success) {
-        setMessage('Registration successful!');
+        redirect('/profile')
       }
     }
   }
@@ -53,7 +53,7 @@ export default function SigninPage() {
           <p>Don't have an account? <Link href="/auth/signup">sign up</Link></p>
         </form>
 
-        {message && <p>{message}</p>}
+        {message && <p className='text-[tomato]'>{message}</p>}
       </div>
     </div>
   );

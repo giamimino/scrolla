@@ -360,6 +360,26 @@
   }
 }
 
+.post {
+  position: relative;
+  cursor: pointer;
+  img {
+    border-radius: 6px;
+  }
+  span {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 1px;
+    bottom: 0;
+    left: 4px;
+
+    svg {
+      color: #db2d2d;
+    }
+  }
+}
+
 @keyframes popUp {
   from {
     transform: scale(0.5);

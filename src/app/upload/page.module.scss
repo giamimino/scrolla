@@ -4,10 +4,12 @@
   gap: 24px;
   align-items: center;
   padding: 48px;
+  user-select: none;
   form {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    width: 300px;
 
     >div {
       display: flex;
@@ -65,7 +67,11 @@
           }
         }
         >main {
+          width: 100%;
           >div {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
             >div {
               display: flex;
               gap: 4px;

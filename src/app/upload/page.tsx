@@ -10,16 +10,24 @@ type User = {
   name: string,
 }
 
+type Tag = {
+  name: string
+}
+
 export default function Upload() {
   const [user, setUser] = useState<User | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
   const [tags, setTags] = useState<string[]>([])
-  const [curTagField, setCurTagField] = useState("")
+  const [curTagField, setCurTagField] = useState<string>("")
   const [error, setError] = useState<string[]>([])
+  const [tagField, setTagField] = useState(false)
+  const [suggest, setSuggest] = useState<Tag | null>(null)
 
   useEffect(() => {
-    setTimeout()
-  })
+    setInterval(() => {
+      setError([])
+    }, 2000)
+  }, [error])
 
   useEffect(() => {
     fetch('api/getUser')
@@ -34,6 +42,20 @@ export default function Upload() {
       }
     })
   }, [])
+
+  useEffect(() => {
+    fetch('api/getTags', {
+      method: "POST",
+      headers: {"content-type": "application/json"},
+      body: JSON.stringify({ curTagField })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if(data.success) {
+        setSuggest(data.tags)
+      }
+    })
+  }, [tagField])
   
   function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -69,14 +91,22 @@ export default function Upload() {
           <label htmlFor="tags">Tags</label>
           <div>
             <div>
-              <input type="text" name='tags' id='tags' autoComplete='off' value={curTagField} onChange={(e) => setCurTagField(e.target.value)} />
-              <button onClick={() => setTags(prev => [...prev, curTagField])}><Icon icon={"streamline:send-email-solid"} /></button>
+              <input type="text" name='tags' id='tags' onFocus={() => setTagField(prev => !prev)} autoComplete='off' value={curTagField} onChange={(e) => setCurTagField(e.target.value)} />
+              <button onClick={() => {
+                  setTags(prev => [...prev, curTagField])
+                  setCurTagField("")
+                }}><Icon icon={"streamline:send-email-solid"} /></button>
+              <aside>
+                  {tagField && 
+                    <p>{suggest?.name}</p>
+                  }
+              </aside>
             </div>
             {tags &&
               <main>
                 <div>
-                  {tags.map((tag) => (
-                    <div key={tag}>
+                  {tags.map((tag, index) => (
+                    <div key={`${tag}-${index}`}>
                       <p>{tag}</p>
                       <button onClick={() => {
                         let tagsArr = tags
@@ -87,9 +117,6 @@ export default function Upload() {
                 </div>
               </main>
             }
-            <aside>
-              
-            </aside>
           </div>
         </div>
         
